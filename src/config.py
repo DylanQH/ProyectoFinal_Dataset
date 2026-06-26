@@ -46,7 +46,7 @@ IMAGE_OUTPUT_DIR = DATASET_ROOT / "JPEGImages"
 ANNOTATIONS_OUTPUT_DIR = DATASET_ROOT / "Annotations"
 CSV_OUTPUT_DIR = ANNOTATIONS_OUTPUT_DIR
 
-USER_PREFIX = "dylan"
+USER_PREFIX = "yutsil_brown"
 CAPTURE_EVERY_N_FRAMES = 25
 
 
@@ -64,7 +64,12 @@ CAPTURE_EVERY_N_FRAMES = 25
 # en ese caso, el vehículo intenta continuar recto.
 
 CRUISING_SPEED_KMH = 30.0
-MAX_STEERING_ANGLE = 0.25
+MAX_STEERING_ANGLE = 0.5
+
+# Comandos de navegación para Conditional Imitation Learning.
+NAV_LEFT = 0      # girar izquierda en la siguiente intersección
+NAV_STRAIGHT = 1  # seguir recto en la siguiente intersección
+NAV_RIGHT = 2     # girar derecha en la siguiente intersección
 DEFAULT_STEERING_ANGLE = 0.0
 
 # Parametros del control manual.
@@ -72,7 +77,7 @@ DEFAULT_STEERING_ANGLE = 0.0
 INITIAL_SPEED_KMH = 0.0
 MIN_SPEED_KMH = -2.5
 MAX_SPEED_KMH = 30.0
-SPEED_INCREMENT_KMH = 5.0
+SPEED_INCREMENT_KMH = 2.5
 STEERING_INCREMENT = 0.025
 
 

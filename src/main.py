@@ -19,6 +19,9 @@ from config import (
     MAX_SPEED_KMH,
     MAX_STEERING_ANGLE,
     MIN_SPEED_KMH,
+    NAV_LEFT,
+    NAV_RIGHT,
+    NAV_STRAIGHT,
     SPEED_INCREMENT_KMH,
     STEERING_INCREMENT,
     USER_PREFIX,
@@ -60,7 +63,7 @@ class CaptureSession:
         self.csv_writer = csv.writer(self.csv_file)
 
         if csv_is_empty:
-            self.csv_writer.writerow(["image_name", "steering_angle"])
+            self.csv_writer.writerow(["image_name", "steering_angle", "nav_command"])
             self.csv_file.flush()
 
     def _find_next_image_number(self):
@@ -78,8 +81,8 @@ class CaptureSession:
 
         return highest_number + 1
 
-    def save(self, steering_angle):
-        """Guarda una imagen y registra su ángulo de volante en el CSV."""
+    def save(self, steering_angle, nav_command):
+        """Guarda una imagen y registra su ángulo de volante y comando de navegación en el CSV."""
 
         while True:
             image_name = f"{self.session_name}_frame_{self.next_image_number}.jpeg"
@@ -93,7 +96,7 @@ class CaptureSession:
         if not image_path.exists():
             raise RuntimeError(f"Webots no pudo guardar la imagen: {image_path}")
 
-        self.csv_writer.writerow([image_name, f"{steering_angle:.6f}"])
+        self.csv_writer.writerow([image_name, f"{steering_angle:.6f}", nav_command])
         self.csv_file.flush()
         self.next_image_number += 1
 
@@ -148,14 +151,17 @@ def main():
 
     capture_session = None
     capture_frame_counter = 0
+    nav_command = NAV_STRAIGHT
 
     print("==========================================")
     print("Control manual iniciado")
     print("Flechas: acelerar, frenar y girar")
     print("A: regresar el volante al ángulo por defecto")
     print("R: iniciar captura de imágenes")
+    print("1: comando izquierda | 2: comando recto | 3: comando derecha")
     print(f"Velocidad inicial: {speed:.1f} km/h")
     print(f"Captura cada {CAPTURE_EVERY_N_FRAMES} frames")
+    print("Comando activo: RECTO")
     print("==========================================")
 
     try:
@@ -200,6 +206,15 @@ def main():
                         MAX_STEERING_ANGLE,
                     )
                     control_changed = True
+                elif key == ord("1"):
+                    nav_command = NAV_LEFT
+                    print("Comando de navegación: IZQUIERDA")
+                elif key == ord("2"):
+                    nav_command = NAV_STRAIGHT
+                    print("Comando de navegación: RECTO")
+                elif key == ord("3"):
+                    nav_command = NAV_RIGHT
+                    print("Comando de navegación: DERECHA")
                 elif key in (ord("r"), ord("R")) and capture_session is None:
                     capture_session = CaptureSession(
                         camera_service=camera_service,
@@ -229,7 +244,7 @@ def main():
                 capture_frame_counter += 1
 
                 if capture_frame_counter >= CAPTURE_EVERY_N_FRAMES:
-                    saved_path = capture_session.save(steering_angle)
+                    saved_path = capture_session.save(steering_angle, nav_command)
                     capture_frame_counter = 0
                     print(f"Imagen guardada: {saved_path.name}")
     finally:
